@@ -14,11 +14,7 @@ app.use((req, res, next) => {
     var log = `${now}: ${req.method} ${req.url}`
     
     console.log(log);
-    fs.appendFile('server.log', log + '\n', (err) => {
-        if (err) {
-            console.log('Unable to append to server.log');
-        }
-    })
+    fs.appendFile('server.log', log + '\n');
     next();
 });
 
@@ -28,22 +24,18 @@ app.use((req, res, next) => {
 
 app.use(express.static(__dirname + '/public'));
 
+hbs.registerHelper('screamIt', (text) => {
+  return text.toUpperCase();
+});
+
 hbs.registerHelper('getCurrentYear', () => {
     return new Date().getFullYear()
 });
 
-hbs.registerHelper('screamIt', (text) => {
-    return text.toUpperCase();
-})
-
 app.get('/', (req, res) => {
-    // res.send('<h1>Hello Express!</h1>');
-    res.send({
-        name: 'Noah',
-        likes: [
-            'guitar',
-            'exercise'
-            ]
+    res.render('home.hbs', {
+        pageTitle: 'Home Page',
+        welcomeMessage: 'Welcome to my website'
     });
 });
 
@@ -53,19 +45,10 @@ app.get('/about', (req, res) => {
    });
 });
 
-app.get('/home', (req, res) => {
-    res.render('home.hbs', {
-        pageTitle: 'Home Page',
-        welcome: 'Welcome to the home page, ya fag.'
-    });
-});
-
 app.get('/bad', (req, res) => {
     res.send({
         errorMessage: 'Unable to handle request.'
     });
 });
 
-app.listen(port, () => {
-    console.log('Server is running.')
-});
+app.listen(process.env.PORT, process.env.IP);
